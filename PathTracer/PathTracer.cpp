@@ -68,7 +68,7 @@ int main()
     const int max_depth = 10;
     Image image{ 720, static_cast<double> (16.0/9.0)};
 
-    camera cam{ image.getaspectratio(), 100 };
+    camera cam{20, image.getaspectratio(), 100 };
 
     scene world{};
     std::shared_ptr<diffuse> material_ground = std::make_shared<diffuse>(vec3(0.8, 0.8, 0.0));

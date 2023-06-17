@@ -15,7 +15,7 @@ public:
 	diffuse(const vec3& col) : albedo{ col } {}
 
 	virtual bool scatter(const ray& rayin, const intersection& intersect, vec3& attentuation, ray& rayout) {
-		vec3 target_on_sphere = intersect.normal + random_in_hemisphere(intersect.normal);  //Yeah random in unit hemisphere but where?, I must provide reference vector, translate and orient at normal at hit point.
+		vec3 target_on_sphere = intersect.point + random_in_hemisphere(intersect.normal);  //Yeah random in unit hemisphere but where?, I must provide reference vector, translate and orient at normal at hit point.
 		vec3 scattered_direction = target_on_sphere - intersect.point;
 		if (scattered_direction.near_zero())
 			scattered_direction = intersect.normal;
