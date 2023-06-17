@@ -6,6 +6,54 @@
 #include "graphics.h"
 #include "material.h"
 
+scene random_scene() {
+    scene world;
+
+    auto ground_material = std::make_shared<diffuse>(vec3(0.5, 0.5, 0.5));
+    world.add(std::make_shared<sphere>(vec3(0, -1000, 0), 1000, ground_material));
+
+    for (int a = -11; a < 11; a++) {
+        for (int b = -11; b < 11; b++) {
+            auto choose_mat = random_double();
+            vec3 center(a + 0.9 * random_double(), 0.2, b + 0.9 * random_double());
+
+            if ((center - vec3(4, 0.2, 0)).length() > 0.9) {
+                std::shared_ptr<material> sphere_material;
+
+                if (choose_mat < 0.8) {
+                    // diffuse
+                    auto albedo = vec3::random() * vec3::random();
+                    sphere_material = std::make_shared<diffuse>(albedo);
+                    world.add(std::make_shared<sphere>(center, 0.2, sphere_material));
+                }
+                else if (choose_mat < 0.95) {
+                    // metal
+                    auto albedo = vec3::random(0.5, 1);
+                    auto fuzz = random_double(0, 0.5);
+                    sphere_material = std::make_shared<metal>(albedo, fuzz);
+                    world.add(std::make_shared<sphere>(center, 0.2, sphere_material));
+                }
+                else {
+                    // glass
+                    sphere_material = std::make_shared<translucent>(1.5, 0.0f);
+                    world.add(std::make_shared<sphere>(center, 0.2, sphere_material));
+                }
+            }
+        }
+    }
+
+    auto material1 = std::make_shared<translucent>(1.5, 0.0f);
+    world.add(std::make_shared<sphere>(vec3(0, 1, 0), 1.0, material1));
+
+    auto material2 = std::make_shared<diffuse>(vec3(0.4, 0.2, 0.1));
+    world.add(std::make_shared<sphere>(vec3(-4, 1, 0), 1.0, material2));
+
+    auto material3 = std::make_shared<metal>(vec3(0.7, 0.6, 0.5), 0.0);
+    world.add(std::make_shared<sphere>(vec3(4, 1, 0), 1.0, material3));
+
+    return world;
+}
+
 /*
 Ray color - How does it work?
 
@@ -23,7 +71,7 @@ vec3 ray_color(const ray& r, const scene& world, int depth) {
         return vec3(0, 0, 0);
     // If we've exceeded the ray bounce limit, no more light is gathered.
 
-    if (world.hitTest(r, 0.000001f, infinity, closest) == true) {
+    if (world.hitTest(r, 0.001f, infinity, closest) == true) {
         ray scattered;
         vec3 attenuation_to_ray; //Essentially color of object we just hit
         closest.hit_obj_material->scatter(r, closest, attenuation_to_ray, scattered);
@@ -63,25 +111,22 @@ vec3 ray_color_iter(ray& r, const scene& world, int depth) {
 
 }
 
+
 int main()
 {
-    const int max_depth = 10;
+    const int max_depth = 20;
     Image image{ 720, static_cast<double> (16.0/9.0)};
 
-    camera cam{ image.getaspectratio(), 100 };
+    vec3 lookfrom(13, 2, 3);
+    vec3 lookat(0, 0, 0);
+    vec3 vup(0, 1, 0);
 
-    scene world{};
-    std::shared_ptr<diffuse> material_ground = std::make_shared<diffuse>(vec3(0.8, 0.8, 0.0));
-    std::shared_ptr<diffuse> material_center = std::make_shared<diffuse>(vec3(0.7, 0.3, 0.3));
-    std::shared_ptr<translucent> material_left = std::make_shared<translucent>(1.5, 0.0);
-    std::shared_ptr<translucent> material_right = std::make_shared<translucent>(1.5, 0.5);
-
-    world.add(std::make_shared<sphere>(vec3(0.0, -100.5, -1.0), 100.0, material_ground));
-    world.add(std::make_shared<sphere>(vec3(0.0, 0.0, -1.0), 0.5, material_center));
-    world.add(std::make_shared<sphere>(vec3(-1.0, 0.0, -1.0), 0.5, material_left));
-    world.add(std::make_shared<sphere>(vec3(1.0, 0.0, -1.0), 0.5, material_right));
+    camera cam(lookfrom, lookat, vup, 20.0, image.getaspectratio(), 500);
+    
+    scene world = random_scene();
 
     for (int j = image.getheight() - 1; j >= 0; --j) {
+        std::cout << "\rScanlines remaining: " << j << ' ' << std::flush;
         for (int i = 0; i < image.getwidth(); ++i) {
             //to sample each pixels number of times (for AA etc), we will add all color samples 
             //(casting rays at same pixel with jitter multiple times), then divide final color by spp.
@@ -97,6 +142,11 @@ int main()
             image.write_color_sampled(pixel_color, cam.getspp());
         }
     }
+
+    std::ofstream outfile;
+    outfile.open("output.ppm", std::ios::out | std::ios::trunc);
+    image.output_ppm(outfile);
+    outfile.close();
 
     Graphics gfx{ image.width, image.height };
     gfx.init();

@@ -15,20 +15,28 @@ private:
 
     double samples_per_pixel;   
 public:
-    camera(double vertical_fov, double aspectratio, double spp) {
+    camera(vec3 lookfrom, vec3 lookat, vec3 view_up, double vertical_fov, double aspectratio, double spp) {
         //Viewport defs. Distance from camera to screen (say we have a virtual screen and we project rays to all points on it,Thats what a viewport is.
-        
-        projection_screen_height = 2.0;
+        double theta = degrees_to_radians(vertical_fov);
+        double h = tan(theta / 2);
+
+        projection_screen_height = 2.0 *h;
         projection_screen_width = aspectratio * projection_screen_height;
-        focal_length = 1.0f;
-        //Focal length  = distance between projection plane and projection point.
+
+
+        //orthonormal basis for the entire camera.
+        vec3 w = unit_vector(lookfrom - lookat); //replacement for focal length, essentially the axis between lookfrom and lookat, line joining camera and screen centre essentially(so focal len)
+
+        vec3 u = unit_vector(cross(view_up, w));
+        vec3 v = cross(w, u);
 
         //Camera defs
-        camera_origin = vec3{ 0.0f, 0.0f, 0.0f };
-        horizontal = vec3{ projection_screen_width, 0.0f, 0.0f };
-        vertical = vec3{ 0.0f, projection_screen_height, 0.0f };
+        camera_origin = lookfrom;
+        horizontal = projection_screen_width * u;
+        vertical = projection_screen_height * v;
+
         //lower left corner point of screen, our reference point on the screen, on top of which we will traverse all pixels.
-        pt_lower_left_corner = vec3{ 0.0f } - (horizontal / 2) - (vertical / 2) - vec3{ 0.0f, 0.0f, focal_length };
+        pt_lower_left_corner = camera_origin - (horizontal / 2) - (vertical / 2) - w;
         //Transform an origin point , to a point on screen lower left corner. Horizontal contributes x coord, Vertical y coord, and length the z. To imagine,
         //go through the seqeunce, taek origin, negate and go to left half of horixontal, then with vertical and so on, we will get to lowerleft.
         samples_per_pixel = spp;
