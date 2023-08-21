@@ -1,6 +1,7 @@
 # CUDA Path Tracer
 
 ![A sample scene!](test_scene.jpg)
+
 A work-in-progress Path Tracer based on Peter Shirley's book, currently using a naive brute force ray tracing algorithm, can simulate Lambert, Metallic, and Transparent objects. I am in the progress of porting the Path tracer to CUDA, which should (even with this brute force algorithm) provide massive gains in performance thanks to parallelism! (GPU MAGIC YAY!).
 
 ## Features
