@@ -3,68 +3,8 @@
 #include <vector>
 #include <random>
 #include <memory>
+#include <curand_kernel.h>
 #include "math.h"
-
-template<typename T>
-class pointer {
-private:
-	T* raw;
-public:
-	//Follow rule of three, needed to make construcor, so need to now make destrucotr and copy constrcutor also
-	pointer(T* ptr = nullptr) : raw{ ptr } {}
-	pointer(const pointer& copy) {
-		raw = new T;
-		*raw = *(copy.raw); //Standard copy assignment of T.
-	}
-
-	//We implement rule of 5 also
-	pointer(const pointer&& move) {
-		raw = move.raw;
-		move.raw = nullptr;
-		//move pointer to different pointer, no need to copy and set other to nullptr
-	}
-
-	//Alwasy return references, because REFERENCES != POINTERS , why? because once references are bound they cannot be changed and they are essentially like normal objetcs?
-	//Also if i do return this, it will copy construct another pointer and reosurce will be duplictaed! Thats why returning a reference in = chain is better!
-
-	pointer& operator=(const pointer& other) {
-		if (&other == this) {
-			return *this;
-		}
-
-		delete raw;
-		raw = new T;  
-		*raw = *(other.raw);
-
-		return *this;
-		//This is currently calling object and seeing as this is a member function overload, then a = b, this is a.
-	}
-	
-	//Can't be const as we must modify 
-	pointer& operator=(pointer&& other) {
-		if (&other == this) {
-			return *this;
-		}
-
-		delete raw;
-		raw = other.raw;
-		other.raw = nullptr;
-
-		return *this;
-	}
-
-	inline T& operator*() {
-		return *raw;
-	}
-
-	inline T* operator->() {
-		return raw;
-	}
-
-	~pointer() {
-		delete raw;
-	}
-};
 
 template<typename T>
 class dyn_array {
@@ -148,6 +88,8 @@ public:
 	int16_t height;
 	double aspect_ratio;
 
+	Image() = default;
+
 	Image(int16_t w, double aspectratio) : width{ w }, aspect_ratio{ aspectratio } {
 		height = static_cast<int>(w / aspect_ratio);
 		pixel_data = dyn_array<float>(width * height * 3);
@@ -157,6 +99,7 @@ public:
 		pixel_data = dyn_array<float>(width * height * 3);
 	}
 	~Image() = default;
+
 	int16_t getwidth() { return width; }
 	int16_t getheight() { return height; }
 	double getaspectratio() { return aspect_ratio; }
@@ -191,6 +134,66 @@ public:
 	}
 };
 
+template<typename T>
+class pointer {
+private:
+	T* raw;
+public:
+	//Follow rule of three, needed to make construcor, so need to now make destrucotr and copy constrcutor also
+	pointer(T* ptr = nullptr) : raw{ ptr } {}
+	pointer(const pointer& copy) {
+		raw = new T;
+		*raw = *(copy.raw); //Standard copy assignment of T.
+	}
+
+	//We implement rule of 5 also
+	pointer(const pointer&& move) {
+		raw = move.raw;
+		move.raw = nullptr;
+		//move pointer to different pointer, no need to copy and set other to nullptr
+	}
+
+	//Alwasy return references, because REFERENCES != POINTERS , why? because once references are bound they cannot be changed and they are essentially like normal objetcs?
+	//Also if i do return this, it will copy construct another pointer and reosurce will be duplictaed! Thats why returning a reference in = chain is better!
+
+	pointer& operator=(const pointer& other) {
+		if (&other == this) {
+			return *this;
+		}
+
+		delete raw;
+		raw = new T;
+		*raw = *(other.raw);
+
+		return *this;
+		//This is currently calling object and seeing as this is a member function overload, then a = b, this is a.
+	}
+
+	//Can't be const as we must modify 
+	pointer& operator=(pointer&& other) {
+		if (&other == this) {
+			return *this;
+		}
+
+		delete raw;
+		raw = other.raw;
+		other.raw = nullptr;
+
+		return *this;
+	}
+
+	inline T& operator*() {
+		return *raw;
+	}
+
+	inline T* operator->() {
+		return raw;
+	}
+
+	~pointer() {
+		delete raw;
+	}
+};
 
 class Image_deprecated {
 public:

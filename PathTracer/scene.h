@@ -1,7 +1,6 @@
 #pragma once
+#include "util.h"
 #include "hittable.h"
-#include <vector>
-#include <memory>
 
 class scene {
 private:

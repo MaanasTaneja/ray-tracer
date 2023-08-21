@@ -47,5 +47,8 @@
     <ClInclude Include="material.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="renderer.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

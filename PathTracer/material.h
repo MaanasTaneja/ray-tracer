@@ -1,5 +1,6 @@
 #pragma once
 #include "util.h"
+#include "hittable.h"
 
 //We define what and how rays reflect and scatter in material structures.
 
@@ -15,6 +16,10 @@ public:
 	diffuse(const vec3& col) : albedo{ col } {}
 
 	virtual bool scatter(const ray& rayin, const intersection& intersect, vec3& attentuation, ray& rayout) {
+		//general how do we use ranom_unit_sphere and random_unit_vector?
+		//point of int + normal at pt + random_in_spehere/vector
+		// (point)     +   (vec3)     +   (random vec3)
+
 		vec3 target_on_sphere = intersect.point + random_in_hemisphere(intersect.normal);  //Yeah random in unit hemisphere but where?, I must provide reference vector, translate and orient at normal at hit point.
 		vec3 scattered_direction = target_on_sphere - intersect.point;
 
@@ -73,7 +78,7 @@ public:
 			scattered_dir = reflect(ray_in_unit, intersect.normal);
 		}
 		else {
-			scattered_dir = refract(ray_in_unit, intersect.normal, refraction_ratio);
+			scattered_dir = refract(ray_in_unit, intersect.normal, refraction_ratio) + frost * random_in_unit_sphere();
 		}
 
 		rayout = ray(intersect.point, scattered_dir);

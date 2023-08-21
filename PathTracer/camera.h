@@ -15,6 +15,8 @@ private:
 
     double samples_per_pixel;   
 public:
+    camera() = default;
+
     camera(vec3 lookfrom, vec3 lookat, vec3 view_up, double vertical_fov, double aspectratio, double spp) {
         //Viewport defs. Distance from camera to screen (say we have a virtual screen and we project rays to all points on it,Thats what a viewport is.
         double theta = degrees_to_radians(vertical_fov);

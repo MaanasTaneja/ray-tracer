@@ -71,8 +71,8 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>C:\Users\maana\source\repos\PathTracer\External;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\maana\source\repos\PathTracer\Libraries;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Users\maana\source\repos\PathTracer\External;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.1\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\maana\source\repos\PathTracer\Libraries;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.1\lib\x64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IncludePath>C:\Users\maana\source\repos\PathTracer\External;$(IncludePath)</IncludePath>
@@ -116,7 +116,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>glfw3.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glfw3.lib;opengl32.lib;cudart.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -146,6 +146,7 @@
     <ClInclude Include="hittable.h" />
     <ClInclude Include="material.h" />
     <ClInclude Include="math.h" />
+    <ClInclude Include="renderer.h" />
     <ClInclude Include="scene.h" />
     <ClInclude Include="util.h" />
   </ItemGroup>
