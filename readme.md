@@ -1,4 +1,4 @@
-# CUDA Path Tracer
+# Path Tracer
 
 ![A sample scene!](test_scene.jpg)
 
